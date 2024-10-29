@@ -1,0 +1,121 @@
+body{
+    background-color: rgb(171, 213, 138);
+    font-family:"Josefin Sans", sans-serif;
+    padding:0;
+    margin:0;
+    //user-select: none;
+    transition:0.3s;
+}
+.button1{
+    margin:20px auto;
+    width:80%;
+    background-color: rgb(134, 207, 76);
+    border:2px solid rgb(146, 213, 93);
+    border-radius:15px;
+    display:block;
+    padding:20px;
+    font-family:"Josefin Sans", sans-serif;
+    font-size:2em;
+}
+h1, h2, h3{
+    text-align: center;
+}
+.hide{
+    display:none;
+}
+#players{
+    margin:0px 20px;
+    display: flex;
+    flex-wrap:wrap;
+    justify-content: space-around;
+}
+.player-frame{
+    width:fit-content;
+    border:2px solid black;
+    margin:5px;
+    border-radius:15px;
+}
+.player-frame h2, .player-frame img{
+    vertical-align: middle;
+    display:inline-block;
+    margin:0 5px;
+    padding:0;
+}
+
+.button-none{
+    background:none;
+    border:none;
+    margin:0;
+    padding:0;
+    outline:none;
+}
+input[type=text], input[type=number]{
+    outline:none;
+    border:none;
+    border-bottom:2px solid black;
+    background:none;
+    display:block;
+    margin:20px auto;
+    font-size:1.5em;
+    width:80%;
+    text-align:center;
+}
+a{
+    text-decoration:none;
+}
+.none{
+    display:none
+}
+header h1{
+    color: #222222;
+}
+#results{
+    margin:auto;
+    display:block;
+    padding:20px;
+}
+#results > div{
+    margin:10px auto;
+    display:block;
+    border:2px solid rgb(77, 149, 22);
+    border-radius:15px;
+    text-align:center;
+}
+label.RADIO{
+    display:block;
+    width:80%;
+    text-align:center;
+    margin:5px auto;
+    //background-color: rgb(134, 207, 76);
+    padding-top:5px;
+    border:2px solid rgb(77, 149, 22);
+    border-radius:15px;
+    font-family:"Josefin Sans", sans-serif;
+    font-size:2em;
+}
+input:checked + label.RADIO{
+    background-color: rgb(134, 207, 76);
+}
+footer{
+    display:block;
+    text-align:center;
+    background-color: #1c850d;
+    position:fixed;
+    bottom:0;
+    left:0;
+    width:100%;
+    margin:0;
+    font-size:1.5em;
+}
+footer p{
+    margin:5px 0;
+}
+.center {
+    width:100%;
+    margin: 0;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    -ms-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+}
