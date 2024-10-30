@@ -141,6 +141,16 @@ io.on('connection', (socket) => {
         rooms.get(socketRoom).updatePlayers();
     })
 
+    socket.once('endgame', ()=>{
+        const socketRoom = sessions.get(SESSION).room
+       if(rooms.get(socketRoom).isHost(SESSION)){
+           for(let i=0; i<rooms.get(socketRoom).sessions.length; i++)
+               sessions.delete(rooms.get(socketRoom).sessions[i]);
+           rooms.delete(socketRoom);
+           io.to(socketRoom).emit('kickinfo');
+       }
+    });
+
     socket.once('startrequest', async ()=>{
         console.log(`Game started`);
         await runGame(sessions.get(SESSION).room, socket);
@@ -178,7 +188,7 @@ async function runGame(roomID, socket){
         //console.log(rooms.get(roomID).players);
         //console.log(io.sockets.sockets.get(socket.id));
 
-        io.to(roomID.toString()).timeout((SECONDS_PER_ROUND+1)*1000).emit('newquestion', QUESTION, rooms.get(roomID).names, async (err, callback)=>{
+        io.to(roomID).timeout((SECONDS_PER_ROUND+1)*1000).emit('newquestion', QUESTION, rooms.get(roomID).names, async (err, callback)=>{
             await console.log(callback);
             let results = [];
             for(let i=0; i<rooms.get(roomID).names.length; i++) results.push(0);
@@ -194,7 +204,8 @@ async function runGame(roomID, socket){
             io.to(roomID.toString()).emit('results', resOut);
         });
 
-        await awaitContinue(roomID);
+        const play = await awaitContinue(roomID);
+        if(play === false) return;
     }
 }
 
@@ -204,9 +215,9 @@ function closeRoom(roomID){
 
 async function awaitContinue(roomID) {
     return new Promise(async (resolve) => {
-        while(rooms.get(roomID).next === false || rooms.get(roomID).ready === false)
+        while(rooms.has(roomID) && (rooms.get(roomID).next === false || rooms.get(roomID).ready === false))
             await delay(500);
-        resolve(true);
+        resolve(rooms.has(roomID));
     });
 }
 

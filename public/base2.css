@@ -126,6 +126,10 @@ label.RADIO{
     font-size:2em;
     transition:0.3s;
 }
+#question{
+    margin:auto;
+    width:90%;
+}
 input:checked + label.RADIO{
     background-color:rgba(255,255,255,0.3);
     transform: scale(1.1);

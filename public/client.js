@@ -129,6 +129,12 @@ socket.on('kickinfo', ()=>{
                     $("#continue").click(()=>{
                         socket.emit('continue');
                     });
+                    $("#endgame").click(async ()=>{
+                        if(confirm("Na pewno chcesz zakończyć grę?")) {
+                            socket.emit('endgame');
+
+                        }
+                    })
                 })
             });
         });
@@ -149,7 +155,8 @@ function renderResults(results){
         S+=`<div><h2>${Object.keys(results)[i]}: ${Object.values(results)[i]}</h2></div>`;
     }
     S+=`</div>`
-    if(isHost)S+=`<button class="button1" id="continue">Następne pytanie</button>`;
+    if(isHost)S+=`<button class="button1" id="continue">Następne pytanie</button>
+    <button class="button1" id="endgame">Zakończ grę</button>`;
     else S+="<h1>Czekaj na następne pytanie!</h1>"
     return S;
 }
