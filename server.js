@@ -119,7 +119,6 @@ io.on('connection', (socket) => {
             //results
             socket.emit('results', rooms.get(sessions.get(SESSION).room).sorted);
         }
-
         const socketRoom = sessions.get(SESSION).room.toString();
         socket.join(socketRoom);
     }
