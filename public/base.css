@@ -24,7 +24,7 @@ h1, h2, h3{
     display:none;
 }
 #players{
-    margin:0px 20px;
+    margin:0 20px;
     display: flex;
     flex-wrap:wrap;
     justify-content: space-around;

@@ -1,5 +1,5 @@
 //settings
-const HOSTNAME = '192.168.56.1';
+const HOSTNAME = 'localhost';
 const SECONDS_PER_ROUND = 20;
 
 const rooms = new Map();
@@ -48,6 +48,7 @@ class room{
         this.host = true;
         this.next = false;
         this.ready = true;
+        this.points = new Map();
         this.qOrder = [];
         for(let i=0; i<questions.length; i++) this.qOrder.push(i);
         for(let i=0; i<questions.length ** 2; i++) {
@@ -55,6 +56,16 @@ class room{
             const tmp = this.qOrder[l];
             this.qOrder[l] = this.qOrder[r];
             this.qOrder[r] = tmp;
+        }
+    }
+    addPoints(winSessions){
+        for(let i=0; i<winSessions.length; i++) {
+            if(this.points.has(winSessions[i])){
+                this.points.set(winSessions[i], this.points.get(winSessions[i]) + 1);
+            }
+            else{
+                this.points.set(winSessions[i], 1);
+            }
         }
     }
     isHost(session){
@@ -146,6 +157,7 @@ io.on('connection', (socket) => {
        if(rooms.get(socketRoom).isHost(SESSION)){
            for(let i=0; i<rooms.get(socketRoom).sessions.length; i++)
                sessions.delete(rooms.get(socketRoom).sessions[i]);
+           console.log(rooms.get(socketRoom).points);
            rooms.delete(socketRoom);
            io.to(socketRoom).emit('kickinfo');
        }
@@ -195,6 +207,16 @@ async function runGame(roomID, socket){
             for(let i=0; i<callback.length; i++){
                 if(callback[i]!==-1) results[callback[i]]++;
             }
+
+            let winSessions = [];
+            let max = results[0];
+            for(let i=0; i<results.length; i++)
+                if(results[i] > max) max = results[i];
+            for(let i=0; i<rooms.get(roomID).sessions.length; i++){
+                if(results[i] === max) winSessions.push(rooms.get(roomID).sessions[i]);
+            }
+            rooms.get(roomID).addPoints(winSessions);
+
             let resOut = {};
             for(let i=0; i<rooms.get(roomID).names.length; i++)
                 resOut[rooms.get(roomID).names[i]]=results[i];

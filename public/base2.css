@@ -32,10 +32,8 @@ h1, h2, h3{
     color: rgb(216, 223, 234);
     text-align: center;
 }
-.hide{
-    display:none;
-}
-#players{
+
+#players, #queue-players{
     margin:0 20px;
     display: flex;
     flex-wrap:wrap;
@@ -126,9 +124,13 @@ label.RADIO{
     font-size:2em;
     transition:0.3s;
 }
+#title{
+    font-size:1.5em;
+}
 #question{
     margin:auto;
     width:90%;
+    font-size:1.3em;
 }
 input:checked + label.RADIO{
     background-color:rgba(255,255,255,0.3);
@@ -146,14 +148,15 @@ input:checked + label.RADIO{
     }
 }
 footer{
+    backdrop-filter: blur(3px);
     display:block;
     text-align:center;
     position:fixed;
     bottom:0;
     left:0;
     width:100%;
-    margin:0;
-    font-size:1.5em;
+    margin:20px 0 0 0;
+    font-size:1.2em;
     color: rgb(216, 223, 234);
 }
 footer p{
@@ -168,3 +171,104 @@ footer p{
     -ms-transform: translate(-50%, -50%);
     transform: translate(-50%, -50%);
 }
+#loader{
+    display:block;
+    margin:auto;
+    animation: loader 3s infinite;
+    transform-origin: bottom;
+}
+@keyframes loader{
+    0%{
+        transform: translateX(-200px) rotate(0deg);
+        opacity:0;
+        scale: 0.7;
+    }
+    25%{
+        transform: translateX(0) rotate(10deg);
+        opacity:1;
+        scale:1.1;
+    }
+    50%{
+        transform: translateX(0) rotate(0deg);
+        opacity:1;
+        scale:1;
+    }
+    75%{
+        transform: translateX(0) rotate(-10deg);
+        opacity:1;
+        scale:1.1;
+    }
+    100%{
+        transform: translateX(200px);
+        opacity:0;
+        scale: 0.7;
+    }
+}
+#loader-title{
+    animation:fader 5s infinite;
+}
+@keyframes fader{
+    0%{
+        opacity:1;
+    }
+    50%{
+        opacity: 0.7;
+    }
+    100%{
+        opacity:1;
+    }
+}
+
+/*#content{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height:fit-content;
+    min-height:80vh;
+    overflow-y: auto;
+}*/
+
+#timer-frame{
+    display:none;
+    width:90%;
+    margin:auto;
+    background-color: rgba(71, 70, 112, 0.61);
+    height:6px;
+    border-radius:5px;
+    padding:4px;
+}
+#timer-bar{
+    display:block;
+    margin:0;
+    height:6px;
+    border-radius:3px;
+    width:0;
+    background-color: #c08adc;
+    transition:1s;
+}
+#header-table{
+    width:100%;
+}
+#leave-room{
+    display:none;
+    margin:auto;
+}
+#back-img1{
+    opacity:0.3;
+    position:absolute;
+    z-index:-10;
+    filter: blur(2px);
+    right:20px;
+    bottom:30px;
+}
+#back-img2{
+    opacity:0.3;
+    position:absolute;
+    z-index:-10;
+    filter: blur(2px);
+    left:20px;
+    top:30px;
+    transform: rotate(40deg);
+}
+

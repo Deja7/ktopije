@@ -1,0 +1,9 @@
+{
+  "await-results": "<img src=\"media/shot.png\" height=\"100\" width=\"100\" alt=\"loader\" id=\"loader\"/>\n<h1 id=\"loader-title\">Czekaj na wyniki</h1>,",
+  "guest-login": "<h3>Wpisz swoje imie</h3>\n<label for=\"playerName\"><input type=\"text\" id=\"playerName\" maxlength=\"18\" placeholder=\"imie\"></label>\n<h3>Wpisz kod gry</h3>\n<label for=\"gameID\"><input type=\"text\" id=\"gameID\" maxlength=\"6\" placeholder=\"123456\"></label>\n<button id=\"login\" class=\"button1\">Dołącz</button>",
+  "guest-queue": "<h1 id=\"gamecode\">Jesteś w pokoju</h1>\n<div id=\"queue-players\"></div>\n<h1>Oczekiwanie na start gry</h1>",
+  "host-login": "<h3>Wpisz swoje imie</h3>\n<label for=\"playerName\"><input type=\"text\" id=\"playerName\" maxlength=\"18\" placeholder=\"imie\"></label>\n<button id=\"login\" class=\"button1\">Utwórz pokój</button>",
+  "host-queue": "<h1 id=\"gamecode\">Podaj kod znajomym</h1>\n<div id=\"queue-players\"></div>\n<button class=\"button1\" id=\"start-game\">Rozpocznij gre</button>",
+  "menu": "<button class=\"button1\" id=\"create-game\">Nowa gra</button>\n<button class=\"button1\" id=\"join-game\">Dołącz do gry</button>",
+  "voting": "<h1 id=\"title\">Kto z was</h1>\n<h1 id=\"question\"></h1>\n<div id=\"players\"></div>\n<button class=\"button1\" id=\"confirm\">Zatwierdź</button>"
+}
