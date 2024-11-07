@@ -1,46 +1,60 @@
 import {io} from "https://cdn.socket.io/4.8.0/socket.io.esm.min.js";
 //import {io} from "/socket.js";
+
 const CON = $("#content");
 function delay(ms) { return new Promise(resolve => setTimeout(resolve, ms)); }
 genSesKey();
-console.log(sessionStorage.getItem("SESSIONID"));
-const socket = io('http://localhost:3000', {
-    auth:{
-        token: sessionStorage.getItem("SESSIONID")
-    }
-});
+console.log(localStorage.getItem("SESSIONID"));
 
 let PAGES;
-await fetch('http://localhost:8000/pages.json')
+await fetch(`http://localhost:8000/pages.json`)
     .then((response) => response.json())
     .then((json) => PAGES = json);
 console.log(PAGES);
+
+const socket = io(`http://localhost:3000`, {
+    auth:{
+        token: localStorage.getItem("SESSIONID")
+    }
+});
+
 socket.on("connect", () => {
     console.log(`You connected with id ${socket.id}`);
 })
 
 function genSesKey(){
-    if(sessionStorage.getItem("SESSIONID") === null) {
+    if(localStorage.getItem("SESSIONID") === null) {
         const chars = "abcdefghijklmnoprstquvwxyzABCDEFGHIJKLMNOPRSTQUVWXYZ0123456789!@#$%^&*()_-+=";
         let S = "";
         for (let i = 0; i < 32; i++) {
             S += chars.charAt(Math.floor(Math.random() * chars.length));
         }
-        sessionStorage.setItem("SESSIONID", S);
+        localStorage.setItem("SESSIONID", S);
         return S;
     }
-    else return sessionStorage.getItem("SESSIONID");
+    else return localStorage.getItem("SESSIONID");
 }
 
 let roomID;
 let isHost = false;
+
+$("#undo").click(async ()=>{
+    await menu();
+})
 socket.on('menu', async ()=>{
+    await menu();
+})
+
+async function menu(){
     $("#leave-room").hide();
+    $("#undo").hide();
     await loadCON("menu");
     //host join
     $("#create-game").click(async ()=>{
         await loadCON("host-login")
+        $("#undo").show();
         $("#login").click(async()=>{
+            $("#undo").hide();
             console.log($("#playerName").val());
             socket.emit('newroom', $("#playerName").val(),async (callback)=>{
                 //roomID=callback;
@@ -61,7 +75,9 @@ socket.on('menu', async ()=>{
     //guest join
     $("#join-game").click(async ()=>{
         await loadCON("guest-login")
+        $("#undo").show();
         $("#login").click(()=>{
+            $("#undo").hide();
             socket.emit('joinroom', $("#playerName").val(), $("#gameID").val(), async (callback)=>{
                 if(callback) {
                     $("#leave-room").show();
@@ -78,10 +94,11 @@ socket.on('menu', async ()=>{
             });
         });
     });
-})
+}
 
 socket.on('queue', async (ROOM)=>{
     $("#leave-room").show();
+    $("#undo").hide();
     if(isHost){
         await loadCON("host-queue");
         socket.emit('getplayers');
@@ -159,6 +176,7 @@ socket.on('setfoot', (id)=>{
 //GAME
 socket.on('question',async(question, players) => {
     $("#leave-room").show();
+    $("#undo").hide();
     //socket.off('players-update');
     await loadCON("voting");
     $("#timer-frame").show();
@@ -180,6 +198,7 @@ socket.on('question',async(question, players) => {
 
 socket.on('results', (results)=>{
     $("#leave-room").show();
+    $("#undo").hide();
     $("#timer-frame").hide();
     console.log(results);
     $("#content").html(renderResults(results));
@@ -198,8 +217,10 @@ $("#leave-room").click(()=>{
         if (confirm("Na pewno chcesz wyjść?"))
             socket.emit('kick', -1);
     }
-    else
-        alert("Jesteś hostem, aby wyjść zakończ grę!");
+    else {
+        if (confirm("Na pewno chcesz wyjść?"))
+            socket.emit('kick', -1);
+    }
 });
 
 async function loadCON2(file){

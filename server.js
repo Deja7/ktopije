@@ -1,5 +1,5 @@
 const HOSTNAME = 'localhost';
-
+const AFKTIME = 600 * 1000;
 const rooms = new Map();
 const sessions = new Map();
 
@@ -53,6 +53,8 @@ class room{
 
         this.points = new Map();
 
+        this.aliveTime = Date.now();
+
         this.Q = 0;
         this.qOrder = [];
         for(let i=0; i<questions.length; i++) this.qOrder.push(i);
@@ -63,6 +65,18 @@ class room{
             this.qOrder[r] = tmp;
         }
     }
+    keepAlive(){
+        this.aliveTime = Date.now();
+    }
+    deleteRoom(){
+        const socketRoom = this.roomID;
+        for (let i = 0; i < this.sessions.length; i++)
+            sessions.delete(this.sessions[i]);
+        console.log(this.points);
+        io.to(socketRoom).emit('kickinfo');
+        rooms.delete(socketRoom);
+    }
+
     addPoints(winSessions){
         for(let i=0; i<winSessions.length; i++) {
             if(this.points.has(winSessions[i])){
@@ -87,10 +101,11 @@ let questions = [];
 loadQs();
 function loadQs(){
     fs.readFile('questions.txt', (err, data) => {
-        questions = data.toString().split('\r\n');
-        //console.log(questions);
+        questions = data.toString().split('\n');
+        console.log(questions);
     });
 }
+
 
 io.on('connection', (socket) => {
     const SESSION = socket.handshake.auth.token;
@@ -193,7 +208,6 @@ io.on('connection', (socket) => {
                 }
                 rooms.get(socketRoom).sessions.splice(i, 1);                         //delete kicked from room
                 rooms.get(socketRoom).names.splice(i, 1);                            // -,-
-                //rooms.get(socketRoom).sockets.splice(i, 1);
                 rooms.get(socketRoom).emitPlayers();
             }
         }
@@ -202,13 +216,8 @@ io.on('connection', (socket) => {
 
     socket.on('endgame', ()=>{
         if(isSafe(SESSION)) {
-            const socketRoom = sessions.get(SESSION).room
-            if (rooms.get(socketRoom).isHost(SESSION)) {
-                for (let i = 0; i < rooms.get(socketRoom).sessions.length; i++)
-                    sessions.delete(rooms.get(socketRoom).sessions[i]);
-                console.log(rooms.get(socketRoom).points);
-                rooms.delete(socketRoom);
-                io.to(socketRoom).emit('kickinfo');
+            if (rooms.get(sessions.get(SESSION).room).isHost(SESSION)){
+                rooms.get(sessions.get(SESSION).room).deleteRoom();
             }
         }
     });
@@ -256,14 +265,25 @@ io.on('connection', (socket) => {
         //}
         console.log(`${socket.id} disconnected`);
     })
-
 });
+
+setInterval(cleaner, 10000);
+
+function cleaner(){
+    rooms.forEach((val, key)=>{
+        if(Date.now() - val.aliveTime >= AFKTIME) {
+            console.log(`Removed room ${val.roomID} for being inactive`)
+            rooms.get(key).deleteRoom();
+        }
+    })
+}
 
 async function runGame(roomID, socket){
     roomID = roomID.toString();
     await delay(100);
 
     for(let QI = 0; QI < questions.length; QI++) {
+        rooms.get(roomID).keepAlive();
         rooms.get(roomID).state = 1;
         rooms.get(roomID).next = false;
         rooms.get(roomID).ready = false;
@@ -340,13 +360,15 @@ async function awaitVote(roomID) {
                 io.to(roomID).emit('time', k);
                 //console.log(rooms.get(roomID).votes.size);
                 //console.log(rooms.get(roomID).sockets.length);
-                if (rooms.get(roomID).votes.size === rooms.get(roomID).sessions.length) {
+                if(rooms.has(roomID))
+                    if (rooms.get(roomID).votes.size === rooms.get(roomID).sessions.length) {
                     clearInterval(check);
                     resolve(1);
-                } else if (Date.now() - start >= timeout) {
+                    } else if (Date.now() - start >= timeout) {
                     clearInterval(check);
                     resolve(0);
-                }
+                    }
+                    //resolve(-1);
             }, interval);
         });
     }
