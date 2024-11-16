@@ -1,39 +1,7 @@
-jest największym alkoholikiem
-jest najbardziej odklejony
-śpi najwięcej
 jest największym bananem
-nie powinien mieć prawa jazdy
-ma najlepszy styl ubierania
-pierwszy umrze
-będzie najwięcej zarabiać
-będzie najmniej zarabiać
-jest najładniejszy
-jest najbrzydszy
-najlepiej tańczy
-będzie mieć dziecko jako pierwszy
-pierwszy weźmie ślub
-będzie najsławniejszy
-jest najbardziej łysy
-ma najładniejsze włosy
-ma najładniejsze oczy
-zostanie gwiazdą porno
-ma największy body count
-jest największym simpem
-jest najgłupszy
-jest najmądrzejszy
 pierwszy walnie dziś zgona
 zrobiłby najwięcej dla pieniędzy
-najlepiej kłamie
-ma najwięcej sekretów
-najwięcej plotkuje
-jest najbardziej uparty
-najczęściej flirtuje
 zdradziłby partnera
-najczęściej przesadza z alkoholem
-ma największe ego
-ma najgorszy gust muzyczny
-najczęściej ogląda porno
-fantazjuje o kimś z grupy
 zdradziłby w związku, gdyby miał pewność, że nikt się nie dowie
 miałby romans w pracy
 ma najwięcej doświadczeń łóżkowych, o których woli nie mówić
@@ -47,19 +15,7 @@ uprawiałby seks nie pamiętając tego
 ma największą skłonność do zakochiwania się w osobach, które są dla niego niedostępne
 udaje, że nie ma nikogo na oku, gdy tak naprawdę jest w kogoś zakochany
 jest najbardziej skłonny do złamania serca innej osobie
-potrafiłby przeżyć bez telefonu przez najdłużej
-najczęściej narzeka
-najczęściej przeprasza
-marzy o karierze artystycznej
-jest najbogatszy
-jest najbiedniejszy
-wypił przez całe życie najwięcej
+
 najwięcej podrożował
-ma najciekawsze hobby
-ma najładniejszy dom
-ma najciekawsze studia
-jest we friendzonie
-ma najwięcej ubrań
+
 jest najbardziej rozrzutny
-jest dzisiaj najlepiej ubrany
-jest dzisiaj najgorzej ubrany

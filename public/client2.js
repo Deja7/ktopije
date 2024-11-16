@@ -10,7 +10,7 @@ let PAGES;
 await fetch(`http://localhost:8000/pages.json`)
     .then((response) => response.json())
     .then((json) => PAGES = json);
-console.log(PAGES);
+//console.log(PAGES);
 
 const socket = io(`http://localhost:3000`, {
     auth:{
@@ -19,6 +19,7 @@ const socket = io(`http://localhost:3000`, {
 });
 
 socket.on("connect", () => {
+    $("#foot").text(``);
     console.log(`You connected with id ${socket.id}`);
 })
 
@@ -54,21 +55,33 @@ async function menu(){
         await loadCON("host-login")
         $("#undo").show();
         $("#login").click(async()=>{
-            $("#undo").hide();
-            console.log($("#playerName").val());
-            socket.emit('newroom', $("#playerName").val(),async (callback)=>{
-                //roomID=callback;
-                console.log(callback);
-                await loadCON("host-queue");
-                socket.emit('getplayers');
-                $("#leave-room").show();
-                $("#gamecode").text(`Podaj znajomym kod ${callback}`);
-                $("#foot").text(`Pokój: ${callback}`);
-                isHost = true;
-                $("#start-game").click(()=>{
-                    socket.emit('startrequest');
+            const name = $("#playerName").val();
+            if($("#playerName").val().length > 0) {
+                $("#undo").hide();
+                console.log($("#playerName").val());
+                socket.emit('newroom', name, async (callback) => {
+                    //roomID=callback;
+                    console.log(callback);
+                    await loadCON("host-queue");
+                    socket.emit('getplayers');
+                    $("#leave-room").show();
+                    $("#gamecode").text(`Podaj znajomym kod ${callback}`);
+                    $("#foot").text(`Pokój: ${callback}`);
+                    isHost = true;
+                    $("#start-game").click(() => {
+                        const time = $("#settings-time").val();
+                        const count = $("#settings-count").val();
+                        const level = [$("#easy").is(':checked'), $("#mid").is(':checked'), $("#hard").is(':checked')];
+                        //console.log(`${time}, ${count}, ${level}`)
+                        if (level[0] || level[1] || level[2])
+                            socket.emit('startrequest', time, count, level);
+                        else alert("Wybierz poziom pytań!");
+                    })
                 })
-            })
+            }
+            else{
+                alert("Wpisz swoją nazwe!")
+            }
         });
     });
 
@@ -77,23 +90,46 @@ async function menu(){
         await loadCON("guest-login")
         $("#undo").show();
         $("#login").click(()=>{
-            $("#undo").hide();
-            socket.emit('joinroom', $("#playerName").val(), $("#gameID").val(), async (callback)=>{
-                if(callback) {
-                    $("#leave-room").show();
-                    let roomID = $("#gameID").val();
-                    await loadCON("guest-queue");
-                    socket.emit('getplayers');
-                    $("#gamecode").text(`Kod gry: ${roomID}`);
-                    $("#foot").text(`Pokój: ${roomID}`);
-                    location.reload();
-                }
-                else{
-                    alert("Błędny kod");
-                }
-            });
+            const name = $("#playerName").val()
+            if(name.length > 0) {
+                $("#undo").hide();
+                socket.emit('joinroom', name, $("#gameID").val(), async (callback) => {
+                    if (callback) {
+                        $("#leave-room").show();
+                        let roomID = $("#gameID").val();
+                        await loadCON("guest-queue");
+                        socket.emit('getplayers');
+                        $("#gamecode").text(`Kod gry: ${roomID}`);
+                        $("#foot").text(`Pokój: ${roomID}`);
+                        location.reload();
+                    } else {
+                        alert("Błędny kod");
+                    }
+                });
+            }
+            else{
+                alert("Wpisz swoje imię!");
+            }
         });
     });
+
+    $("#how-to-play").click(async ()=> {
+        $("#undo").show();
+        await loadCON("tutorial");
+        let page = 1;
+        $(".tuto-right").click(()=>{
+            $(`#tg${page}`).hide();
+            page++;
+            $(`#tg${page}`).show();
+        })
+        $(".tuto-left").click(()=>{
+            $(`#tg${page}`).hide();
+            page--;
+            $(`#tg${page}`).show();
+        })
+
+    });
+
 }
 
 socket.on('queue', async (ROOM)=>{
@@ -137,8 +173,8 @@ socket.on('queue', async (ROOM)=>{
 socket.on('players-update', (players)=>{
     let S = "";
     for(let i = 0; i < players.length; i++){
-        S+=`<div class="player-frame"><h2 class="noslide">${players[i]}</h2>`;
-        if(isHost && i>0)S+=`<button class="button-none kick noslide" id="kick${i}">
+        S+=`<div class="player-frame"><h2 class="noslide inline">${players[i]}</h2>`;
+        if(isHost && i>0)S+=`<button class="button-none kick noslide inline" id="kick${i}">
 <img src="media/close.png" alt="close" width="20" class="noslide"></button>`;
         S+=`</div>`
     }
@@ -174,11 +210,12 @@ socket.on('setfoot', (id)=>{
 })
 
 //GAME
-socket.on('question',async(question, players) => {
+socket.on('question',async(question, players, currentQ) => {
     $("#leave-room").show();
     $("#undo").hide();
     //socket.off('players-update');
     await loadCON("voting");
+    $("#question-number").text(currentQ);
     $("#timer-frame").show();
     $("#question").text(question);
     $("#players").html(renderRadios(players));
@@ -212,13 +249,25 @@ socket.on('results', (results)=>{
     })
 })
 
+socket.on('endresults', async (results)=>{
+    await loadCON("end-stats");
+    $("#leave-room").show();
+    $("#undo").hide();
+    $("#timer-frame").hide();
+    console.log(results);
+    $("#players").html(renderEndResults(results));
+    $("#leave-end").click(async ()=>{
+        socket.emit('kick', -1);
+    })
+})
+
 $("#leave-room").click(()=>{
     if(!isHost) {
         if (confirm("Na pewno chcesz wyjść?"))
             socket.emit('kick', -1);
     }
     else {
-        if (confirm("Na pewno chcesz wyjść?"))
+        if (confirm("UWAGA jesteś hostem, jeśli wyjdziesz z gry wszyscy gracze zostaną wyrzuceni! Czy na pewno chcesz wyjść?"))
             socket.emit('kick', -1);
     }
 });
@@ -250,7 +299,13 @@ function renderRadios(players){
 function renderResults(results){
     let S="<h1>Wyniki</h1><div id='results'>";
     for(let i = 0; i < Object.keys(results).length; i++){
-        S+=`<div><h2>${Object.keys(results)[i]}: ${Object.values(results)[i]}</h2></div>`;
+        if(Object.values(results)[i].drinks == 1){
+            S+=`<div class="player-drinks"><img src="media/shot2.png" alt="" width="20" height = "20" class="inline noslide">
+            <h2 class="inline">${Object.keys(results)[i]}: ${Object.values(results)[i]["voteCount"]}</h2></div>`;
+        }
+        else{
+            S+=`<div><h2 class="inline">${Object.keys(results)[i]}: ${Object.values(results)[i]["voteCount"]}</h2></div>`;
+        }
     }
     S+=`</div>`
     if(isHost)S+=`<button class="button1" id="continue">Następne</button>
@@ -259,5 +314,18 @@ function renderResults(results){
     return S;
 }
 
-   //           kc <3
+function renderEndResults(results){
+    let S = "";
+    for(let i = 0; i < Object.keys(results).length; i++){
+        if(Object.values(results)[i].drinks == 1){
+            S+=`<div class="player-drinks"><h2 class="inline">${Object.keys(results)[i]}: ${Object.values(results)[i]["points"]}</h2>
+            <img src="media/shot2.png" alt="" width="20" height = "20" class="inline noslide"></div>`;
+        }
+        else{
+            S+=`<div><h2 class="inline">${Object.keys(results)[i]}: ${Object.values(results)[i]["voteCount"]}</h2></div>`;
+        }
+    }
+    return S;
+}
 
+   //           kc <3

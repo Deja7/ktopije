@@ -38,6 +38,9 @@ h1, h2, h3{
     display: flex;
     flex-wrap:wrap;
     justify-content: space-around;
+    backdrop-filter: blur(2px);
+    background-color: rgba(255,255,255,0.1);
+    border-radius:3px;
 }
 .player-frame{
     width:fit-content;
@@ -88,9 +91,6 @@ input[type=text], input[type=number]{
     font-size:1.5em;
     width:80%;
     text-align:center;
-}
-.hide{
-    display:none;
 }
 input::placeholder{
     color: rgba(255, 255, 255, 0.6);
@@ -275,21 +275,139 @@ footer p{
     transform: rotate(40deg);
 }
 
-.alert{
-    width:80%;
-    height:fit-content;
-}
-
-#alert-box{
-    position:absolute;
-    left:0;
-    top:0;
-    width:100vw;
-    height:100vh;
-    backdrop-filter: blur(3px);
-}
-
 .inline{
     display:inline;
 }
+#packs-frame{
+    display:block;
+    margin:auto;
+    width:80%;
+}
 
+label{
+    color: rgb(216, 223, 234);
+}
+
+label[for="settings-time"], label[for="settings-time"] h2, label[for="settings-count"], label[for="settings-count"] h2{
+    margin:0;
+    padding:0;
+}
+#settings-time-frame, #settings-count-frame{
+    display:block;
+    margin:auto;
+    width:fit-content;
+}
+#settings-frame{
+    display:block;
+    margin:10px 0;
+}
+select{
+    background:none;
+    outline:none;
+    font-family:inherit;
+    border:none;
+    color:white;
+    font-size:1.5em;
+}
+
+option{
+    color:black;
+    background:rgba(255,255,255,0.4);
+}
+#packs-flex{
+    display:flex;
+    justify-content: center;
+    margin:auto;
+}
+
+label.pack{
+    font-size:1.5em;
+    text-align:center;
+    margin:5px 15px 5px 15px;
+    display:inline-block;
+    //transform-origin: bottom;
+    transition: 0.5s;
+    border-radius:3px;
+    opacity:0.7;
+
+}
+input:checked + label.pack{
+    transform: scale(1.2) rotate(5deg);
+    opacity:1;
+}
+input:checked + label[for="easy"]{
+    text-shadow: 0 0 3px #37bc05;
+}
+input:checked + label[for="mid"]{
+    text-shadow: 0 0 3px #e6f805;
+}
+input:checked + label[for="hard"]{
+    text-shadow: 0 0 3px #d60e06;
+}
+input[type="checkbox"]{
+    display:none;
+}
+#packs-flex span{
+    padding:5px;
+    margin:0 5px;
+    border-bottom:2px solid white;
+    border-radius:3px;
+    box-shadow:0 0 4px black;
+}
+.player-drinks{
+    display:block;
+    margin:auto;
+}
+
+.tuto-card{
+    display:block;
+    margin:auto;
+    width:80vw;
+
+    height:fit-content;
+    //min-height:60vh;
+
+    //border:2px solid black;
+    border-radius:15px;
+    background-color:rgba(0, 0,0, 0.5);
+    box-shadow: 0 0 10px black;
+
+
+    position:absolute;
+    left:50%;
+    top:50%;
+    transform: translate(-50%,-50%);
+}
+.flip{
+    transform: scaleX(-1);
+}
+.round-img{
+    border-radius: 50%;
+    margin:4px;
+    box-shadow: 0 0 3px white;
+}
+.tuto-card table{
+    margin:auto;
+}
+.tuto-card p, .tuto-card li{
+    color:white;
+    font-size:1.3em;
+    margin:0 10px 10px 10px;
+}
+.fakebutton1{
+    margin:30px auto;
+    width:fit-content;
+    box-shadow: 0 0 2px #4d2ea1;
+    border-radius:5px;
+    outline:none;
+    background-color:rgba(255,255,255,0.2);
+    font-family:"Josefin Sans", sans-serif;
+    padding:0.1em;
+    font-size:1em;
+    color: rgb(216, 223, 234);
+    //backdrop-filter: blur(20px);
+    transition:0.5s;
+}
+.hide{
+    display:none;
+}

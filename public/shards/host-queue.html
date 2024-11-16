@@ -1,3 +1,41 @@
 <h1 id="gamecode">Podaj kod znajomym</h1>
 <div id="queue-players"></div>
+<div id="settings-frame">
+    <br>
+    <div id="settings-time-frame">
+        <label  class="inline" style="float:left" for="settings-time">
+            <h2>Czas na odpowiedź: </h2>
+        </label>
+        <select id="settings-time" class="inline">
+            <option value="10">10s</option>
+            <option value="20" selected>20s</option>
+            <option value="30">30s</option>
+        </select>
+    </div>
+    <br>
+    <div id="settings-count-frame">
+        <label  class="inline" style="float:left" for="settings-count">
+            <h2>Ilość pytań: </h2>
+        </label>
+        <select id="settings-count" class="inline">
+            <option value="10">10</option>
+            <option value="25" selected>25</option>
+            <option value="50">50</option>
+        </select>
+    </div>
+    <div id="packs-frame">
+        <h2>Pytania: </h2>
+        <div id="packs-flex">
+            <span>
+                <input type="checkbox" id="easy" checked/><label for="easy" class="pack noslide">Łatwe</label>
+            </span>
+            <span>
+                <input type="checkbox" id="mid"/><label for="mid" class="pack noslide">Średnie</label>
+            </span>
+            <span>
+                <input type="checkbox" id="hard"/><label for="hard" class="pack noslide">Trudne</label>
+            </span>
+        </div>
+    </div>
+</div>
 <button class="button1" id="start-game">Rozpocznij gre</button>
