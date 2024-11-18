@@ -1,6 +1,5 @@
 import {io} from "https://cdn.socket.io/4.8.0/socket.io.esm.min.js";
 //import {io} from "/socket.js";
-
 const CON = $("#content");
 function delay(ms) { return new Promise(resolve => setTimeout(resolve, ms)); }
 genSesKey();
@@ -50,48 +49,52 @@ async function menu(){
     $("#leave-room").hide();
     $("#undo").hide();
     await loadCON("menu");
+
+    if(localStorage.getItem("NAME") === null) {}
+        $("#playerName").val(localStorage.getItem("NAME"));
+
+
     //host join
     $("#create-game").click(async ()=>{
-        await loadCON("host-login")
-        $("#undo").show();
-        $("#login").click(async()=>{
-            const name = $("#playerName").val();
-            if($("#playerName").val().length > 0) {
-                $("#undo").hide();
-                console.log($("#playerName").val());
-                socket.emit('newroom', name, async (callback) => {
-                    //roomID=callback;
-                    console.log(callback);
-                    await loadCON("host-queue");
-                    socket.emit('getplayers');
-                    $("#leave-room").show();
-                    $("#gamecode").text(`Podaj znajomym kod ${callback}`);
-                    $("#foot").text(`Pokój: ${callback}`);
-                    isHost = true;
-                    $("#start-game").click(() => {
-                        const time = $("#settings-time").val();
-                        const count = $("#settings-count").val();
-                        const level = [$("#easy").is(':checked'), $("#mid").is(':checked'), $("#hard").is(':checked')];
-                        //console.log(`${time}, ${count}, ${level}`)
-                        if (level[0] || level[1] || level[2])
-                            socket.emit('startrequest', time, count, level);
-                        else alert("Wybierz poziom pytań!");
-                    })
+        const name = $("#playerName").val();
+        if(name.length > 0) {
+            localStorage.setItem("NAME", name);
+            $("#undo").hide();
+            console.log($("#playerName").val());
+            socket.emit('newroom', name, async (callback) => {
+                //roomID=callback;
+                console.log(callback);
+                await loadCON("host-queue");
+                socket.emit('getplayers');
+                $("#leave-room").show();
+                $("#gamecode").text(`Podaj znajomym kod ${callback}`);
+                $("#foot").text(`Pokój: ${callback}`);
+                isHost = true;
+                $("#start-game").click(() => {
+                    const time = $("#settings-time").val();
+                    const count = $("#settings-count").val();
+                    const level = [$("#easy").is(':checked'), $("#mid").is(':checked'), $("#hard").is(':checked')];
+                    //console.log(`${time}, ${count}, ${level}`)
+                    if (level[0] || level[1] || level[2])
+                        socket.emit('startrequest', time, count, level);
+                    else alert("Wybierz poziom pytań!");
                 })
-            }
-            else{
-                alert("Wpisz swoją nazwe!")
-            }
-        });
+            })
+        }
+        else{
+            alert("Wpisz swoje imię!")
+        }
     });
 
     //guest join
     $("#join-game").click(async ()=>{
-        await loadCON("guest-login")
-        $("#undo").show();
-        $("#login").click(()=>{
-            const name = $("#playerName").val()
-            if(name.length > 0) {
+        const name = $("#playerName").val()
+        if(name.length > 0) {
+            localStorage.setItem("NAME", name);
+            await loadCON("guest-login")
+            $("#hello-message").text(`Cześć ${name}!`);
+            $("#undo").show();
+            $("#login").click(()=>{
                 $("#undo").hide();
                 socket.emit('joinroom', name, $("#gameID").val(), async (callback) => {
                     if (callback) {
@@ -106,11 +109,11 @@ async function menu(){
                         alert("Błędny kod");
                     }
                 });
-            }
-            else{
-                alert("Wpisz swoje imię!");
-            }
-        });
+            });
+        }
+        else{
+            alert("Wpisz swoje imię!");
+        }
     });
 
     $("#how-to-play").click(async ()=> {
@@ -127,9 +130,12 @@ async function menu(){
             page--;
             $(`#tg${page}`).show();
         })
-
     });
 
+    $("#info").click(async ()=> {
+        $("#undo").show();
+        await loadCON("info");
+    });
 }
 
 socket.on('queue', async (ROOM)=>{

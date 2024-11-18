@@ -71,6 +71,9 @@ h1, h2, h3{
         opacity: 1;
     }
 }
+.margin-auto{
+    margin:auto;
+}
 input, textarea, button {font-family: inherit}
 .button-none{
     background:none;
@@ -93,7 +96,7 @@ input[type=text], input[type=number]{
     text-align:center;
 }
 input::placeholder{
-    color: rgba(255, 255, 255, 0.6);
+    color: rgba(255, 255, 255, 0.9);
     font-style:italic;
 }
 a{
@@ -410,4 +413,63 @@ input[type="checkbox"]{
 }
 .hide{
     display:none;
+}
+.menu-card{
+    display:block;
+    margin:auto;
+    width:90vw;
+    max-width:500px;
+
+    height:fit-content;
+    padding:2px;
+
+    border-radius:5px;
+    background-color: rgba(154, 76, 2510,0.7);
+    box-shadow: 0 0 5px black;
+}
+.button2{
+    background-color:rgba(0,0,0,0.1);
+    margin: 10px auto;
+    width:80%;
+    border:none;
+    box-shadow: 0 0 5px #372663;
+    border-radius:3px;
+    outline:none;
+    display:block;
+    padding:5px;
+    font-family:"Josefin Sans", sans-serif;
+    font-size:1.8em;
+    color: rgb(216, 223, 234);
+    backdrop-filter: blur(20px);
+    transition:0.5s;
+}
+.button2:active{
+    transform:scale(1.1);
+}
+
+.button3{
+    margin: 10px auto;
+    width:fit-content;
+    border:none;
+    border-bottom:2px solid white;
+    outline:none;
+    display:block;
+    background:none;
+    font-family:"Josefin Sans", sans-serif;
+    font-size:1.5em;
+    color: rgb(216, 223, 234);
+    transition:0.5s;
+}
+.button3:active{
+    transform:scale(1.1);
+}
+
+#menu-flex{
+    display:flex;
+    align-items:center;
+    flex-wrap:wrap;
+    height:80vh;
+    align-content: center;
+    max-width:500px;
+    margin:auto;
 }
