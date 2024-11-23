@@ -3,7 +3,7 @@ import {io} from "https://cdn.socket.io/4.8.0/socket.io.esm.min.js";
 const CON = $("#content");
 function delay(ms) { return new Promise(resolve => setTimeout(resolve, ms)); }
 genSesKey();
-console.log(localStorage.getItem("SESSIONID"));
+console.log(sessionStorage.getItem("SESSIONID"));
 
 let PAGES;
 await fetch(`http://localhost:8000/pages.json`)
@@ -13,7 +13,7 @@ await fetch(`http://localhost:8000/pages.json`)
 
 const socket = io(`http://localhost:3000`, {
     auth:{
-        token: localStorage.getItem("SESSIONID")
+        token: sessionStorage.getItem("SESSIONID")
     }
 });
 
@@ -23,16 +23,16 @@ socket.on("connect", () => {
 })
 
 function genSesKey(){
-    if(localStorage.getItem("SESSIONID") === null) {
+    if(sessionStorage.getItem("SESSIONID") === null) {
         const chars = "abcdefghijklmnoprstquvwxyzABCDEFGHIJKLMNOPRSTQUVWXYZ0123456789!@#$%^&*()_-+=";
         let S = "";
         for (let i = 0; i < 32; i++) {
             S += chars.charAt(Math.floor(Math.random() * chars.length));
         }
-        localStorage.setItem("SESSIONID", S);
+        sessionStorage.setItem("SESSIONID", S);
         return S;
     }
-    else return localStorage.getItem("SESSIONID");
+    else return sessionStorage.getItem("SESSIONID");
 }
 
 let roomID;
@@ -95,9 +95,9 @@ async function menu(){
             $("#hello-message").text(`Cześć ${name}!`);
             $("#undo").show();
             $("#login").click(()=>{
-                $("#undo").hide();
                 socket.emit('joinroom', name, $("#gameID").val(), async (callback) => {
                     if (callback) {
+                        $("#undo").hide();
                         $("#leave-room").show();
                         let roomID = $("#gameID").val();
                         await loadCON("guest-queue");
@@ -223,7 +223,7 @@ socket.on('question',async(question, players, currentQ) => {
     await loadCON("voting");
     $("#question-number").text(currentQ);
     $("#timer-frame").show();
-    $("#question").text(question);
+    $("#question").text(`Kto z was ${question}?`);
     $("#players").html(renderRadios(players));
     $("#confirm").click(()=>{
         const vote = parseInt($("input[name='RADIO']:checked").val());
@@ -316,7 +316,7 @@ function renderResults(results){
     S+=`</div>`
     if(isHost)S+=`<button class="button1" id="continue">Następne</button>
     <button class="button1" id="endgame">Zakończ grę</button>`;
-    else S+="<h1>Czekaj na następne pytanie!</h1>"
+    else S+="<h2>Czekaj na następne pytanie!</h2>"
     return S;
 }
 

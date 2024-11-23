@@ -473,3 +473,7 @@ input[type="checkbox"]{
     max-width:500px;
     margin:auto;
 }
+#width-wrapper{
+    max-width:400px;
+    margin:auto;
+}
