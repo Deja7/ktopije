@@ -3,7 +3,7 @@ import {io} from "https://cdn.socket.io/4.8.0/socket.io.esm.min.js";
 const CON = $("#content");
 function delay(ms) { return new Promise(resolve => setTimeout(resolve, ms)); }
 genSesKey();
-console.log(sessionStorage.getItem("SESSIONID"));
+console.log(localStorage.getItem("SESSIONID"));
 
 let PAGES;
 await fetch(`http://localhost:8000/pages.json`)
@@ -13,7 +13,7 @@ await fetch(`http://localhost:8000/pages.json`)
 
 const socket = io(`http://localhost:3000`, {
     auth:{
-        token: sessionStorage.getItem("SESSIONID")
+        token: localStorage.getItem("SESSIONID")
     }
 });
 
@@ -23,16 +23,16 @@ socket.on("connect", () => {
 })
 
 function genSesKey(){
-    if(sessionStorage.getItem("SESSIONID") === null) {
+    if(localStorage.getItem("SESSIONID") === null) {
         const chars = "abcdefghijklmnoprstquvwxyzABCDEFGHIJKLMNOPRSTQUVWXYZ0123456789!@#$%^&*()_-+=";
         let S = "";
         for (let i = 0; i < 32; i++) {
             S += chars.charAt(Math.floor(Math.random() * chars.length));
         }
-        sessionStorage.setItem("SESSIONID", S);
+        localStorage.setItem("SESSIONID", S);
         return S;
     }
-    else return sessionStorage.getItem("SESSIONID");
+    else return localStorage.getItem("SESSIONID");
 }
 
 let roomID;
