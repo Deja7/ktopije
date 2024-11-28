@@ -248,11 +248,6 @@ socket.on('results', (results)=>{
     $("#continue").click(()=>{
         socket.emit('continue');
     });
-    $("#endgame").click(async ()=>{
-        if(confirm("Na pewno chcesz zakończyć grę?")) {
-            socket.emit('endgame');
-        }
-    })
 })
 
 socket.on('endresults', async (results)=>{
@@ -314,8 +309,7 @@ function renderResults(results){
         }
     }
     S+=`</div>`
-    if(isHost)S+=`<button class="button1" id="continue">Następne</button>
-    <button class="button1" id="endgame">Zakończ grę</button>`;
+    if(isHost)S+=`<button class="button1" id="continue">Kontynuuj</button>`
     else S+="<h2>Czekaj na następne pytanie!</h2>"
     return S;
 }

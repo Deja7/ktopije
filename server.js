@@ -24,7 +24,6 @@ io.use((socket, next) =>{
             sessions.set(token, {});
             sessions.get(token).socket = socket.id;
         } else {//refreshed
-            //console.log(`${sessions.get(token).socket} => ${socket.id}`)
             sessions.get(token).socket = socket.id;
             if (sessions.get(token).hasOwnProperty("room")) {
                 socket.join(sessions.get(token).room);
@@ -130,7 +129,6 @@ io.on('connection', (socket) => {
     const SESSION = socket.handshake.auth.token;
     console.log(`${socket.id} connected on token ${SESSION}`);
 
-
     if(sessions.get(SESSION).room !== undefined && rooms.has(sessions.get(SESSION).room)){       //if user reconnected
         socket.emit('host', rooms.get(sessions.get(SESSION).room).isHost(SESSION) ? 'true' : 'false');
         socket.emit('setfoot', sessions.get(SESSION).room);
@@ -168,7 +166,7 @@ io.on('connection', (socket) => {
     //console.log(sessions);
 
     socket.on('joinroom', (username, roomID, callback) => {
-        if(rooms.has(roomID)){
+        if(rooms.has(roomID) && username.length < 20){
             sessions.get(SESSION).room = roomID;
             sessions.get(SESSION).name = username;
             rooms.get(roomID).sessions.push(SESSION);
@@ -179,12 +177,12 @@ io.on('connection', (socket) => {
             callback(true);
         }
         else {
-            console.log(`${username} tried to join ${roomID} (doesn't exist)`);
             callback(false);
         }
     });
 
     socket.on('newroom', async (username, callback) =>{
+        if(username.length < 20){
         let numberValid = false, roomID;
         while(!numberValid){
             roomID = Math.floor(Math.random() * 899999) + 100000;
@@ -201,6 +199,7 @@ io.on('connection', (socket) => {
 
         //rooms.get(roomID).updatePlayers();//emit message
         callback(roomID);
+        }
     });
 
     socket.on('getplayers', ()=>{
@@ -214,28 +213,28 @@ io.on('connection', (socket) => {
     socket.on('kick', (i, callback) => {
         if(isSafe(SESSION)) {
             const socketRoom = sessions.get(SESSION).room;
-            if(i === -1 && rooms.get(socketRoom).isHost(SESSION)) {
-                rooms.get(socketRoom).deleteRoom();
-            }
-            else if (i === -1) {
-                console.log(`${rooms.get(socketRoom).names[i]} left room`);
-                socket.emit('kickinfo');
-                sessions.delete(SESSION);                             //delete kicked session
-                for (i = 0; i < rooms.get(socketRoom).sessions.length; i++) {
-                    if (rooms.get(socketRoom).sessions[i] === SESSION) break;
+            if(i<rooms.get(socketRoom).names.length) {
+                if (i === -1 && rooms.get(socketRoom).isHost(SESSION)) {
+                    rooms.get(socketRoom).deleteRoom();
+                } else if (i === -1) {
+                    console.log(`${rooms.get(socketRoom).names[i]} left room`);
+                    socket.emit('kickinfo');
+                    sessions.delete(SESSION);                             //delete kicked session
+                    for (i = 0; i < rooms.get(socketRoom).sessions.length; i++) {
+                        if (rooms.get(socketRoom).sessions[i] === SESSION) break;
+                    }
+                    rooms.get(socketRoom).sessions.splice(i, 1);                         //delete kicked from room
+                    rooms.get(socketRoom).names.splice(i, 1);                            // -,-
+                    rooms.get(socketRoom).emitPlayers();
+                } else if (rooms.get(socketRoom).isHost(SESSION)) {
+                    console.log(`kicked ${rooms.get(socketRoom).names[i]}`);
+                    io.to(sessions.get(rooms.get(socketRoom).sessions[i]).socket).emit('kickinfo'); //info to kicked client
+                    sessions.delete(rooms.get(socketRoom).sessions[i]);                             //delete kicked session
+                    rooms.get(socketRoom).sessions.splice(i, 1);                         //delete kicked from room
+                    rooms.get(socketRoom).names.splice(i, 1);                            // -,-
+                    //rooms.get(socketRoom).sockets.splice(i, 1);
+                    rooms.get(socketRoom).emitPlayers();
                 }
-                rooms.get(socketRoom).sessions.splice(i, 1);                         //delete kicked from room
-                rooms.get(socketRoom).names.splice(i, 1);                            // -,-
-                rooms.get(socketRoom).emitPlayers();
-            }
-            else if (rooms.get(socketRoom).isHost(SESSION)) {
-                console.log(`kicked ${rooms.get(socketRoom).names[i]}`);
-                io.to(sessions.get(rooms.get(socketRoom).sessions[i]).socket).emit('kickinfo'); //info to kicked client
-                sessions.delete(rooms.get(socketRoom).sessions[i]);                             //delete kicked session
-                rooms.get(socketRoom).sessions.splice(i, 1);                         //delete kicked from room
-                rooms.get(socketRoom).names.splice(i, 1);                            // -,-
-                //rooms.get(socketRoom).sockets.splice(i, 1);
-                rooms.get(socketRoom).emitPlayers();
             }
         }
         //rooms.get(socketRoom).updatePlayers();
@@ -252,7 +251,7 @@ io.on('connection', (socket) => {
     socket.on('startrequest', async (time, rounds, level)=>{
         if(isSafe(SESSION)) {
             //validate
-            if (time > 0 && time < 60 && rounds > 0 && rounds <= 50 && (level[0] || level[1] || level[2])) {
+            if (time > 0 && time < 60 && rounds > 0 && rounds <= 100 && (level[0] || level[1] || level[2])) {
                 if (rooms.get(sessions.get(SESSION).room).state === 0 && rooms.get(sessions.get(SESSION).room).isHost(SESSION)) {
                     rooms.get(sessions.get(SESSION).room).voteTime = time;
                     rooms.get(sessions.get(SESSION).room).rounds = rounds;
@@ -302,7 +301,7 @@ io.on('connection', (socket) => {
     })
 });
 
-setInterval(cleaner, 10000);
+setInterval(cleaner, 60000);
 
 function cleaner(){
     rooms.forEach(async (val, key)=>{
@@ -402,9 +401,6 @@ async function runGame(roomID, socket){
     //console.log(endRes);
 }
 
-function closeRoom(roomID){
-    rooms.delete(roomID);
-}
 
 async function awaitContinue(roomID) {
     return new Promise(async (resolve) => {
